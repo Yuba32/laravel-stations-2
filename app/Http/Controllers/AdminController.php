@@ -83,4 +83,25 @@ class AdminController extends Controller
     // return view('adminEditMovie')->with('movie',$movie);
     return view('adminEditMovie', compact('movie'));
   }
+
+  public function destroy($id)
+  {
+    $movie = movie::find($id);
+
+    //if movie is not found,return status code 404 and message
+    if ($movie == null) {
+      // return redirect()->route('movie.list',null,404);
+      return response('', 404);
+    }
+
+    $result =  $movie->delete();
+
+    if ($result == 0) {
+      $flashmessage = "削除に成功しました.";
+      return redirect()->route('movie.list')->with('message.success', $flashmessage);
+    } else {
+      $flashmessage = "エラーが発生しました.";
+      return redirect()->route('movie.list')->with('message.error', $flashmessage);
+    }
+  }
 }
