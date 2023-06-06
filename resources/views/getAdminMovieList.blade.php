@@ -20,38 +20,44 @@
         <td>概要</td>
         <td>登録日時</td>
         <td>更新日時</td>
+        <td>編集</td>
       </tr>
     </thead>
 
     <tbody>
       @foreach ($movies as $movie)
         <tr>
-          {{ $movie->id }}
-        </tr>
-        <tr>
-          {{ $movie->title }}
-        </tr>
-        <tr>
-          {{ $movie->image_url }}
-        </tr>
-        <tr>
-          {{ $movie->published_year }}
-        </tr>
-        <tr>
-          @if ($movie->is_showing)
-            上映中
-          @else
-            上映予定
-          @endif
-        </tr>
-        <tr>
-          {{ $movie->description }}
-        </tr>
-        <tr>
-          {{ $movie->created_at }}
-        </tr>
-        <tr>
-          {{ $movie->updated_at }}
+          <td>
+            {{ $movie->id }}
+          </td>
+          <td>
+            {{ $movie->title }}
+          </td>
+          <td>
+            {{ $movie->image_url }}
+          </td>
+          <td>
+            {{ $movie->published_year }}
+          </td>
+          <td>
+            @if ($movie->is_showing)
+              上映中
+            @else
+              上映予定
+            @endif
+          </td>
+          <td>
+            {{ $movie->description }}
+          </td>
+          <td>
+            {{ $movie->created_at }}
+          </td>
+          <td>
+            {{ $movie->updated_at }}
+          </td>
+          <td>
+            <a href="{{ route('movie.edit', $movie->id) }}">編集</a>
+          </td>
         </tr>
 
         {{-- <li><img src="{{ $movie->image_url }}" alt=""></li> --}}
