@@ -38,3 +38,5 @@ Route::get('/admin/movies/{id}/edit', [AdminController::class, 'edit'])->name('m
 Route::patch('/admin/movies/{id}/update', [AdminController::class, 'update'])->name('movie.update');
 
 Route::delete('/admin/movies/{id}/destroy', [AdminController::class, 'destroy'])->name('movie.destroy');
+
+Route::get('/sheets', [MovieController::class, 'sheets'])->name('sheet.list');

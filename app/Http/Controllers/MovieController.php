@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use App\Models\Sheet;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -40,5 +41,21 @@ class MovieController extends Controller
     $movie_list = $query->paginate(20);
 
     return view('getMovies')->with(['movie_list' => $movie_list, 'is_showing' => $is_showing, 'keyword' => $keyword]);
+  }
+
+  public function sheets()
+  {
+    $sheets = Sheet::all();
+    $alphabet = range('a', 'z');
+
+    foreach ($sheets as $sheet) {
+      $sheet->rowint = array_search($sheet->row, $alphabet) + 1;
+    }
+
+    $sheets->sortBy([['rowint', 'asc'], ['column', 'asc']]);
+    $columns = $sheets->max('column');
+    $rows = $sheets->max('rowint');
+
+    return view('getSheetsTable')->with(['sheet_list' => $sheets, 'columns' => $columns, 'rows' => $rows]);
   }
 }
