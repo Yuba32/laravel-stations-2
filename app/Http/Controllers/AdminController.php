@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use App\Models\Genre;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Type\Integer;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -23,22 +25,40 @@ class AdminController extends Controller
   public function store(Request $request)
   {
 
-    $validated = $request->validate([
-      'title' => 'required|unique:movies',
-      'image_url' => 'required|url',
-      'published_year' => 'required',
-      'is_showing' => 'required',
-      'description' => 'required',
-    ]);
+    $result =  DB::transaction(function () use ($request) {
+      $validated = $request->validate([
+        'title' => 'required|unique:movies',
+        'image_url' => 'required|url',
+        'published_year' => 'required',
+        'is_showing' => 'required',
+        'description' => 'required',
+        'genre' => 'required'
+      ]);
 
-    $movie = new Movie;
-    $movie->title = $request->title;
-    $movie->image_url = $request->image_url;
-    $movie->published_year = $request->published_year;
-    $movie->is_showing = $request->is_showing;
-    $movie->description = $request->description;
+      $movie = new Movie;
+      $movie->title = $request->title;
+      $movie->image_url = $request->image_url;
+      $movie->published_year = $request->published_year;
+      $movie->is_showing = $request->is_showing;
+      $movie->description = $request->description;
 
-    if ($movie->save()) {
+      $genre_name = $request->genre;
+      $genre_db = DB::table('genres');
+
+      if ($genre_db->where('name', $genre_name)->exists()) {
+        $genre_id = $genre_db->where('name', $genre_name)->value('id');
+      } else {
+        $genre = new Genre;
+        $genre->name = $genre_name;
+        $genre->save();
+        $genre_id = $genre->id;
+      }
+
+      $movie->genre_id = $genre_id;
+      $movie->save();
+    });
+
+    if ($result == 0) {
       $flashmessage = "エラーが発生しました.";
       return redirect('/admin/movies')->with('message.error', $flashmessage);
     } else {
@@ -49,25 +69,43 @@ class AdminController extends Controller
 
   public function update(Request $request, $id)
   {
-    $movie =  Movie::find($id);
+    $result =  DB::transaction(function () use ($request, $id) {
+      $movie =  Movie::find($id);
 
-    $validated = $request->validate([
-      'title' => 'required|unique:movies',
-      'image_url' => 'required|url',
-      'published_year' => 'required',
-      'is_showing' => 'required',
-      'description' => 'required',
-    ]);
+      $validated = $request->validate([
+        'title' => 'required|unique:movies',
+        'image_url' => 'required|url',
+        'published_year' => 'required',
+        'is_showing' => 'required',
+        'description' => 'required',
+        'genre' => 'required',
+      ]);
 
-    $movie->title = $request->title;
-    $movie->image_url = $request->image_url;
-    $movie->published_year = $request->published_year;
-    $movie->is_showing = $request->is_showing;
-    $movie->description = $request->description;
+      $movie->title = $request->title;
+      $movie->image_url = $request->image_url;
+      $movie->published_year = $request->published_year;
+      $movie->is_showing = $request->is_showing;
+      $movie->description = $request->description;
 
-    $result = $movie->save();
+      $genre_name = $request->genre;
+      $genre_db = DB::table('genres');
+      $genre_id = "";
 
-    if ($result) {
+      if ($genre_db->where('name', $genre_name)->exists()) {
+        $genre_id = $genre_db->where('name', $genre_name)->value('id');
+      } else {
+        $genre = new Genre;
+        $genre->name = $genre_name;
+        $genre->save();
+        $genre_id = $genre->id;
+      }
+
+      $movie->genre_id = $genre_id;
+
+      $movie->save();
+    });
+
+    if ($result == 0) {
       $flashmessage = "エラーが発生しました.";
       return redirect()->route('movie.edit', $request->id)->with('message.error', $flashmessage);
     } else {
@@ -78,7 +116,10 @@ class AdminController extends Controller
 
   public function edit($id)
   {
-    $movie = Movie::find($id);
+    // $movie = Movie::find($id);
+    $movie = Movie::with('genre')->find($id);
+    // $movie->genre = Genre::find($movie->genre_id);
+    // $movie->genre = DB::table('genres')->where('id', $movie->genre_id)->value('name');
 
     // return view('adminEditMovie')->with('movie',$movie);
     return view('adminEditMovie', compact('movie'));
