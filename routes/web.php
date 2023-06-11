@@ -40,6 +40,23 @@ Route::patch('/admin/movies/{id}/update', [AdminController::class, 'update'])->n
 
 Route::delete('/admin/movies/{id}/destroy', [AdminController::class, 'destroy'])->name('movie.destroy');
 
+//スケジュール一覧
+Route::get('/admin/schedules', [AdminController::class, 'getallschedules'])->name('schedule.getall');
+
+//スケジュール詳細(スケジュールID)
+Route::get('/admin/schedules/{id}', [AdminController::class, 'getschedulebyid'])->name('schedule.getbyid');
+
+//スケジュール作成画面
+Route::get('/admin/movies/{id}/schedules/create', [AdminController::class, 'createschedule'])->name('schedule.create');
+//スケジュール編集画面
+Route::get('/admin/schedules/{scheduleId}/edit', [AdminController::class, 'editschedule'])->name('schedule.edit');
+//スケジュール更新
+Route::patch('/admin/schedules/{id}/update', [AdminController::class, 'updateschedule'])->name('schedule.update');
+//スケジュール削除
+Route::delete('/admin/schedules/{id}/destroy', [AdminController::class, 'destroyschedule'])->name('schedule.destroy');
+
+
 Route::get('/sheets', [MovieController::class, 'sheets'])->name('sheet.list');
 
 Route::get('/movies/{id}', [MovieController::class, 'movieinfo'])->name('movie.info');
+
