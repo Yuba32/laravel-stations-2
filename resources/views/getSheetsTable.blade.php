@@ -28,10 +28,9 @@
           <th>-</th>
         </thead>
         <tbody>
-          {{ $alphabet = range('a', 'z') }}
           @for ($i = 0; $i < $rows; $i++)
             <tr>
-              @for ($j = 0; $j < $columns; $j++)
+              @for ($j = 1; $j <= $columns; $j++)
                 <td>{{ $alphabet[$i] }}-{{ $j }}</td>
               @endfor
             </tr>

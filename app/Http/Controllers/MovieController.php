@@ -56,6 +56,6 @@ class MovieController extends Controller
     $columns = $sheets->max('column');
     $rows = $sheets->max('rowint');
 
-    return view('getSheetsTable')->with(['sheet_list' => $sheets, 'columns' => $columns, 'rows' => $rows]);
+    return view('getSheetsTable')->with(['sheet_list' => $sheets, 'columns' => $columns, 'rows' => $rows, 'alphabet' => $alphabet]);
   }
 }
