@@ -30,6 +30,7 @@ Route::get('/movies', [MovieController::class, 'index'])->name('movie.search');
 
 Route::get('/admin/movies', [AdminController::class, 'movies'])->name('movie.list');
 
+
 Route::get('/admin/movies/create', [AdminController::class, 'create'])->name('movie.create');
 Route::post('/admin/movies/store', [AdminController::class, 'store'])->name('movie.store');
 
@@ -40,3 +41,5 @@ Route::patch('/admin/movies/{id}/update', [AdminController::class, 'update'])->n
 Route::delete('/admin/movies/{id}/destroy', [AdminController::class, 'destroy'])->name('movie.destroy');
 
 Route::get('/sheets', [MovieController::class, 'sheets'])->name('sheet.list');
+
+Route::get('/movies/{id}', [MovieController::class, 'movieinfo'])->name('movie.info');

@@ -116,12 +116,7 @@ class AdminController extends Controller
 
   public function edit($id)
   {
-    // $movie = Movie::find($id);
     $movie = Movie::with('genre')->find($id);
-    // $movie->genre = Genre::find($movie->genre_id);
-    // $movie->genre = DB::table('genres')->where('id', $movie->genre_id)->value('name');
-
-    // return view('adminEditMovie')->with('movie',$movie);
     return view('adminEditMovie', compact('movie'));
   }
 
@@ -129,9 +124,7 @@ class AdminController extends Controller
   {
     $movie = movie::find($id);
 
-    //if movie is not found,return status code 404 and message
     if ($movie == null) {
-      // return redirect()->route('movie.list',null,404);
       return response('', 404);
     }
 

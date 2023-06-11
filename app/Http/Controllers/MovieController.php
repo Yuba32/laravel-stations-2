@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Movie;
 use App\Models\Sheet;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -57,5 +58,15 @@ class MovieController extends Controller
     $rows = $sheets->max('rowint');
 
     return view('getSheetsTable')->with(['sheet_list' => $sheets, 'columns' => $columns, 'rows' => $rows, 'alphabet' => $alphabet]);
+  }
+
+  public function movieinfo($id)
+  {
+    $movie = Movie::find($id);
+    // $schedules = Schedule::where('movie_id', $id)->get();
+    // $schedules->sortBy('start_time');
+    $schedules = $movie->schedules()->orderBy('start_time')->get();
+
+    return view('getMovieInfo')->with(['movie' => $movie, 'schedules' => $schedules]);
   }
 }
