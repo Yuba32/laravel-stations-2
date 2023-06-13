@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Movie;
 use App\Models\Genre;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Type\Integer;
 use Illuminate\Support\Facades\DB;
@@ -141,7 +143,88 @@ class AdminController extends Controller
 
     public function getallschedules()
     {
-        $movies = Movie::all();
-        return view('getAdminScheduleList', ['movies' => $movies]);
+        $movies = Movie::all()->schedule();
+        return view('adminShowAllSchedule', compact('movies'));
     }
+
+    public function getschedulebyid($id)
+    {
+        $schedule = Schedule::find($id);
+        return view('adminShowSchedulebyid', compact('schedule'));
+    }
+
+    public function createschedulemenu()
+    {
+        return view('adminCreateSchedule');
+    }
+
+    public function storeschedule(Request $request)
+    {
+        $validated = $request->validate([
+            'movie_id' => 'required',
+            'start_time_date' => 'required',
+            'start_time_time' => 'required',
+            'end_time_date' => 'required',
+            'end_time_time' => 'required',
+        ]);
+
+        $schedule = new Schedule;
+
+        //carbon check rule
+
+        $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
+        $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
+
+        $schedule->movie_id = $request->movie_id;
+        $schedule->start_time = $start_time;
+        $schedule->end_time = $end_time;
+
+        $schedule->save();
+    }
+
+    public function editschedule($scheduleId)
+    {
+        $schedule = Schedule::find($scheduleId);
+        return view('adminEditSchedule', compact('schedule'));
+    }
+
+    public function updateschedule(Request $request, $id)
+    {
+        $schedule = Schedule::find($id);
+
+        $validated = $request->validate([
+            'start_time_date' => 'required',
+            'start_time_time' => 'required',
+            'end_time_date' => 'required',
+            'end_time_time' => 'required',
+        ]);
+
+        //check format is correct(YYYY-MM-DD H:i)
+        $rules =
+            //日付時刻を結合
+        $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
+        $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
+
+        $schedule->start_time = $start_time;
+        $schedule->end_time = $end_time;
+
+        //更新処理
+        $schedule->save();
+    }
+
+
+    public function destroyallschedule($id)
+    {
+        $schedule = Schedule::find($id);
+        $schedule->delete();
+
+    }
+
+    public function adminmovieinfo($id)
+    {
+        $movie = Movie::find($id);
+        $schedules = $movie->schedules()->orderBy('start_time')->get();
+        return view('adminMovieInfo', compact('movie', 'schedules'));
+    }
+
 }

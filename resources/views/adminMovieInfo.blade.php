@@ -7,10 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
 
-    <title>映画作品詳細</title>
+    <title>管理者スケジュール詳細</title>
 </head>
 
 <body>
+
 <div>
     <table>
         <tr>
@@ -44,6 +45,8 @@
     </table>
 
 </div>
+
+<h2>上映予定</h2>
 <table>
     <thead>
     <tr>
@@ -60,14 +63,13 @@
     @else
         @foreach ($schedules as $schedule)
             <tr>
-                <td>{{ $schedule->start_time->format('H:i') }}</td>
-                <td>{{ $schedule->end_time->format('H:i') }}</td>
+                <td>{{ $schedule->start_time }}</td>
+                <td>{{ $schedule->end_time }}</td>
             </tr>
         @endforeach
     @endif
     </tbody>
 </table>
-
 
 </body>
 

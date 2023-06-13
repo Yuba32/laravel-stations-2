@@ -29,10 +29,10 @@ Route::get('/getPractice', [PracticeController::class, 'getPractice']);
 Route::get('/movies', [MovieController::class, 'index'])->name('movie.search');
 
 Route::get('/admin/movies', [AdminController::class, 'movies'])->name('movie.list');
-
-
 Route::get('/admin/movies/create', [AdminController::class, 'create'])->name('movie.create');
 Route::post('/admin/movies/store', [AdminController::class, 'store'])->name('movie.store');
+
+Route::get('/admin/movies/{id}', [AdminController::class, 'adminmovieinfo'])->name('movie.admininfo');
 
 Route::get('/admin/movies/{id}/edit', [AdminController::class, 'edit'])->name('movie.edit');
 
@@ -47,16 +47,20 @@ Route::get('/admin/schedules', [AdminController::class, 'getallschedules'])->nam
 Route::get('/admin/schedules/{id}', [AdminController::class, 'getschedulebyid'])->name('schedule.getbyid');
 
 //スケジュール作成画面
-Route::get('/admin/movies/{id}/schedules/create', [AdminController::class, 'createschedule'])->name('schedule.create');
+Route::get('/admin/movies/{id}/schedules/create', [AdminController::class, 'createschedulemenu'])->name('schedule.create');
+Route::post('/admin/movies/{id}/schedules/store', [AdminController::class, 'storeschedule'])->name('schedule.store');
+
 //スケジュール編集画面
 Route::get('/admin/schedules/{scheduleId}/edit', [AdminController::class, 'editschedule'])->name('schedule.edit');
+
 //スケジュール更新
 Route::patch('/admin/schedules/{id}/update', [AdminController::class, 'updateschedule'])->name('schedule.update');
+
 //スケジュール削除
 Route::delete('/admin/schedules/{id}/destroy', [AdminController::class, 'destroyschedule'])->name('schedule.destroy');
-
 
 Route::get('/sheets', [MovieController::class, 'sheets'])->name('sheet.list');
 
 Route::get('/movies/{id}', [MovieController::class, 'movieinfo'])->name('movie.info');
+
 

@@ -11,18 +11,30 @@
 
 <body>
 
-<div>
-    <ul>
-        @foreach ($movie_list as $movie)
-            <li>タイトル: {{ $movie->title }} </li>
-            <li><img src="{{ $movie->image_url }}" alt=""></li>
-        @endforeach
-    </ul>
-</div>
+<a href="">新規作成</a>
 
-<div class="mt-1 mb-1 row justify-content-center">
-    {{ $movie_list->links() }}
-</div>
+@foreach ($movies as $movie)
+    {{--    @if ($movie->schedules()->count() != 0)--}}
+    <div>
+        <h2>ID: {{$movie->id}} タイトル: {{$movie->title}}</h2>
+        <div>
+            <ul>
+                <li>
+                    @foreach($movie->schedules()->get() as $schedule)
+                        <ul>
+                            <li>ID : {{$schedule->id}}</li>
+                            <li>開始時刻 : {{$schedule->start_time->format('H:i')}}</li>
+                            <li>終了時刻 : {{$schedule->end_time->format('H:i')}}</li>
+                            {{--link to getschedulebyid--}}
+                            <li><a href="{{route('schedule.getbyid', ['id' => $schedule->id])}}">詳細</a></li>
+                        </ul>
+                    @endforeach
+                </li>
+            </ul>
+        </div>
+    </div>
+    {{--    @endif--}}
+@endforeach
 
 </body>
 
