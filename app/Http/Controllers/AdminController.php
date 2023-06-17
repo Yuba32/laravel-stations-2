@@ -164,47 +164,6 @@ class AdminController extends Controller
         return view('adminCreateSchedule', ['id' => $id]);
     }
 
-
-    public function createschedule(Request $request, $id)
-    {
-        $result = DB::transaction(function () use ($request) {
-            $validated = $request->validate([
-                'movie_id' => 'required',
-                'start_time_date' => ['required', 'date_format:Y-m-d'],
-                'start_time_time' => ['required', 'date_format:H:i'],
-                'end_time_date' => ['required', 'date_format:Y-m-d'],
-                'end_time_time' => ['required', 'date_format:H:i'],
-            ]);
-
-            if ($movie == null) {
-                return response('', 404);
-            }
-
-            $schedule = new Schedule;
-            // $start_time = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_time_date . ' ' . $request->start_time_time);
-//            $start_time = Carbon::create($request->start_time_date . ' ' . $request->start_time_time);
-            $start_time = $request->start_time_date . ' ' . $request->start_time_time;
-            // $end_time = Carbon::createFromFormat('Y-m-d H:i:s', $request->end_time_date . ' ' . $request->end_time_time);
-//            $end_time = Carbon::create($request->end_time_date . ' ' . $request->end_time_time);
-            $end_time = $request->end_time_date . ' ' . $request->end_time_time;
-
-
-            $schedule->movie_id = $request->movie_id;
-            $schedule->start_time = $start_time;
-            $schedule->end_time = $end_time;
-
-            $schedule->save();
-        });
-        if ($result == 0) {
-            $flashmessage = "エラーが発生しました.";
-//             return redirect()->route('schedule.create', $id)->with('message.success', $flashmessage);
-            return redirect('error', 500);
-        } else {
-            $flashmessage = "スケジュールを作成しました.";
-            return redirect()->route('schedule.create', $id)->with('message.success', $flashmessage);
-        }
-    }
-
     public function storeschedule(Request $request, $id)
     {
         $movie = Movie::find($id);
@@ -214,17 +173,45 @@ class AdminController extends Controller
         $result = DB::transaction(function () use ($request, $id) {
             $validated = $request->validate([
                 'movie_id' => 'required',
-                'start_time_date' => ['required', 'date_format:Y-m-d'],
-                'start_time_time' => ['required', 'date_format:H:i'],
-                'end_time_date' => ['required', 'date_format:Y-m-d'],
-                'end_time_time' => ['required', 'date_format:H:i'],
+                'start_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:end_time_date'],
+                'start_time_time' => ['bail', 'required', 'date_format:H:i', 'before:end_time_time', function ($attribute, $value, $fail) use ($request) {
+
+
+//                    $start_time = Carbon::createFromTimeString($request->start_time_time);
+//                    $end_time = Carbon::createFromTimeString($request->end_time_time);
+
+                    $start_time = Carbon::parse(($request->start_time_date . ' ' . $request->input('start_time_time')));
+                    $end_time = Carbon::parse(($request->end_time_date . ' ' . $request->input('end_time_time')));
+
+
+                    if ($start_time->diffInMinutes($end_time) <= 5) {
+                        $fail('開始時刻と終了時刻の差が5分以上ある必要があります');
+                    }
+                }],
+                'end_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:start_time_date'],
+                //開始時刻と終了時刻の差が5分以上あるか
+                'end_time_time' => ['bail','required', 'date_format:H:i', 'after:start_time_time', function ($attribute, $value, $fail) use ($request) {
+
+
+//                    $start_time = Carbon::createFromTimeString($request->start_time_time);
+//                    $end_time = Carbon::createFromTimeString($request->end_time_time);
+
+                    $start_time = Carbon::parse(($request->start_time_date . ' ' . $request->input('start_time_time')));
+                    $end_time = Carbon::parse(($request->end_time_date . ' ' . $request->input('end_time_time')));
+
+
+                    if ($start_time->diffInMinutes($end_time) <= 5) {
+                        $fail('開始時刻と終了時刻の差が5分以上ある必要があります');
+                    }
+                }],
+
             ]);
 
             $schedule = new Schedule;
-//            $start_time = Carbon::createFromFormat('Y-m-d H:i', $request->start_time_date . ' ' . $request->start_time_time)->format('Y-m-d H:i:s');
-//            $end_time = Carbon::createFromFormat('Y-m-d H:i', $request->end_time_date . ' ' . $request->end_time_time)->format('Y-m-d H:i:s');
-            $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time)->format('Y-m-d H:i');
-            $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time)->format('Y-m-d H:i');
+//            $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
+//            $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
+            $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
+            $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
 
 
             $schedule->movie_id = $id;
@@ -264,27 +251,48 @@ class AdminController extends Controller
 
         $validated = $request->validate([
             'movie_id' => 'required',
-            'start_time_date' => ['required', 'date_format:Y-m-d'],
-            'start_time_time' => ['required', 'date_format:H:i'],
-            'end_time_date' => ['required', 'date_format:Y-m-d'],
-            'end_time_time' => ['required', 'date_format:H:i'],
+            'start_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:end_time_date'],
+            'start_time_time' => ['bail', 'required', 'date_format:H:i', 'before:end_time_time', function ($attribute, $value, $fail) use ($request) {
+
+
+//                $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
+//                $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
+                $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
+                $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
+
+                if ($start_time->diffInMinutes($end_time) <= 5) {
+                    $fail('開始時刻と終了時刻の差が5分以上ある必要があります');
+                }
+            }],
+            'end_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:start_time_date'],
+            'end_time_time' => ['bail','required', 'date_format:H:i', 'after:start_time_time', function ($attribute, $value, $fail) use ($request) {
+
+
+//                $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
+//                $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
+                $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
+                $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
+
+                if ($start_time->diffInMinutes($end_time) <= 5) {
+                    $fail('開始時刻と終了時刻の差が5分以上ある必要があります');
+                }
+            }],
         ]);
 
-        //check format is correct(YYYY-MM-DD H:i)
-        $rules =
-            //日付時刻を結合
-        $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time)->format('Y-m-d H:i');
-        $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time)->format('Y-m-d H:i');
+//        $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
+//        $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
+        $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
+        $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
 
-        $schedule->start_time = $start_time;
-        $schedule->end_time = $end_time;
+        $schedule->start_time = $start_time->format('Y-m-d H:i');
+        $schedule->end_time = $end_time->format('Y-m-d H:i');
 
         //更新処理
         $schedule->save();
         if ($schedule == null) {
-            return redirect()->route('schedule.edit', $id)->with('message.success', '更新に失敗しました.');
+            return redirect()->route('schedule.edit', $id)->with('message . success', '更新に失敗しました.');
         } else {
-            return redirect()->route('schedule.edit', $id)->with('message.success', '更新に成功しました.');
+            return redirect()->route('schedule.edit', $id)->with('message . success', '更新に成功しました.');
         }
     }
 
