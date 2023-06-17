@@ -47,6 +47,7 @@
 </div>
 
 <h2>上映予定</h2>
+<a href="{{route('schedule.create',$movie->id)}}">スケジュール新規作成</a>
 <table>
     <thead>
     <tr>
@@ -56,13 +57,15 @@
     </thead>
 
     <tbody>
-    @if ($schedules->isEmpty())
+    @if ($movie->schedules->isEmpty())
         <tr>
             <td colspan="2">上映スケジュールはありません</td>
         </tr>
     @else
-        @foreach ($schedules as $schedule)
+        @foreach ($movie->schedules as $schedule)
             <tr>
+                <td><a href="{{route('schedule.getbyid', ['id' => $schedule->id])}}"> ID
+                        : {{$schedule->id}}</a></td>
                 <td>{{ $schedule->start_time }}</td>
                 <td>{{ $schedule->end_time }}</td>
             </tr>

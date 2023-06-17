@@ -10,7 +10,7 @@ class Movie extends Model
     use HasFactory;
     public function genre()
     {
-        return $this->belongsTo('App\Models\Genre');
+        return $this->belongsTo('App\Models\Genre','genre_id');
     }
     public function schedules()
     {

@@ -11,7 +11,6 @@
 
 <body>
 
-<a href="">新規作成</a>
 
 @foreach ($movies as $movie)
     {{--    @if ($movie->schedules()->count() != 0)--}}
@@ -20,13 +19,13 @@
         <div>
             <ul>
                 <li>
-                    @foreach($movie->schedules()->get() as $schedule)
+                    @foreach($movie->schedules as $schedule)
                         <ul>
-                            <li>ID : {{$schedule->id}}</li>
+                            {{--link to getschedulebyid--}}
+                            <li><a href="{{route('schedule.getbyid', ['id' => $schedule->id])}}"> ID
+                                    : {{$schedule->id}}</a></li>
                             <li>開始時刻 : {{$schedule->start_time->format('H:i')}}</li>
                             <li>終了時刻 : {{$schedule->end_time->format('H:i')}}</li>
-                            {{--link to getschedulebyid--}}
-                            <li><a href="{{route('schedule.getbyid', ['id' => $schedule->id])}}">詳細</a></li>
                         </ul>
                     @endforeach
                 </li>
