@@ -44,6 +44,9 @@
     </table>
 
 </div>
+
+{{$movie_id = $movie->id}}
+
 <table>
     <thead>
     <tr>
@@ -60,8 +63,10 @@
     @else
         @foreach ($schedules as $schedule)
             <tr>
+                {{$schedule_id = $schedule->id}}
                 <td>{{ $schedule->start_time->format('H:i') }}</td>
                 <td>{{ $schedule->end_time->format('H:i') }}</td>
+                <td><a href="{{route('sheet.select',[$movie_id,$schedule_id,$schedule->start_time])}}">座席を予約する</a></td>
             </tr>
         @endforeach
     @endif

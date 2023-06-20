@@ -33,7 +33,7 @@
 
 <body>
 
-<div class="alert aclert-danger">
+<div class="alert alert-danger">
     <ul>
         @if (session('message.error'))
             <li>{{ session('message.error') }}</li>

@@ -176,10 +176,6 @@ class AdminController extends Controller
                 'start_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:end_time_date'],
                 'start_time_time' => ['bail', 'required', 'date_format:H:i', 'before:end_time_time', function ($attribute, $value, $fail) use ($request) {
 
-
-//                    $start_time = Carbon::createFromTimeString($request->start_time_time);
-//                    $end_time = Carbon::createFromTimeString($request->end_time_time);
-
                     $start_time = Carbon::parse(($request->start_time_date . ' ' . $request->input('start_time_time')));
                     $end_time = Carbon::parse(($request->end_time_date . ' ' . $request->input('end_time_time')));
 
@@ -190,15 +186,10 @@ class AdminController extends Controller
                 }],
                 'end_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:start_time_date'],
                 //開始時刻と終了時刻の差が5分以上あるか
-                'end_time_time' => ['bail','required', 'date_format:H:i', 'after:start_time_time', function ($attribute, $value, $fail) use ($request) {
-
-
-//                    $start_time = Carbon::createFromTimeString($request->start_time_time);
-//                    $end_time = Carbon::createFromTimeString($request->end_time_time);
+                'end_time_time' => ['bail', 'required', 'date_format:H:i', 'after:start_time_time', function ($attribute, $value, $fail) use ($request) {
 
                     $start_time = Carbon::parse(($request->start_time_date . ' ' . $request->input('start_time_time')));
                     $end_time = Carbon::parse(($request->end_time_date . ' ' . $request->input('end_time_time')));
-
 
                     if ($start_time->diffInMinutes($end_time) <= 5) {
                         $fail('開始時刻と終了時刻の差が5分以上ある必要があります');
@@ -208,8 +199,6 @@ class AdminController extends Controller
             ]);
 
             $schedule = new Schedule;
-//            $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
-//            $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
             $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
             $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
 
@@ -254,9 +243,6 @@ class AdminController extends Controller
             'start_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:end_time_date'],
             'start_time_time' => ['bail', 'required', 'date_format:H:i', 'before:end_time_time', function ($attribute, $value, $fail) use ($request) {
 
-
-//                $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
-//                $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
                 $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
                 $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
 
@@ -265,11 +251,8 @@ class AdminController extends Controller
                 }
             }],
             'end_time_date' => ['required', 'date_format:Y-m-d', 'date_equals:start_time_date'],
-            'end_time_time' => ['bail','required', 'date_format:H:i', 'after:start_time_time', function ($attribute, $value, $fail) use ($request) {
+            'end_time_time' => ['bail', 'required', 'date_format:H:i', 'after:start_time_time', function ($attribute, $value, $fail) use ($request) {
 
-
-//                $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
-//                $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
                 $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
                 $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
 
@@ -279,8 +262,6 @@ class AdminController extends Controller
             }],
         ]);
 
-//        $start_time = Carbon::createFromFormat('Y/m/d H時i分', $request->start_time_date . ' ' . $request->start_time_time);
-//        $end_time = Carbon::createFromFormat('Y/m/d H時i分', $request->end_time_date . ' ' . $request->end_time_time);
         $start_time = Carbon::parse($request->start_time_date . ' ' . $request->start_time_time);
         $end_time = Carbon::parse($request->end_time_date . ' ' . $request->end_time_time);
 
@@ -309,12 +290,12 @@ class AdminController extends Controller
 
     public function adminmovieinfo($id)
     {
-//        $movie = Movie::find($id);
+        //        $movie = Movie::find($id);
         $movie = Movie::with('schedules')->find($id);
         if ($movie == null) {
             return response('', 404);
         }
-//        $schedules = $movie->schedules()->orderBy('start_time')->get();
+        //        $schedules = $movie->schedules()->orderBy('start_time')->get();
         return view('adminMovieInfo', compact('movie'));
     }
 }

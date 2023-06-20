@@ -15,7 +15,7 @@ class MovieController extends Controller
     public function index(Request $request)
     {
         $movies = Movie::orderBy('id', 'desc');
-        $movie_list = $movies->paginate(20);
+//        $movie_list = $movies->paginate(20);
 
         $query = Movie::query();
 
@@ -69,4 +69,6 @@ class MovieController extends Controller
 
         return view('getMovieInfo')->with(['movie' => $movie, 'schedules' => $schedules]);
     }
+
+
 }
