@@ -46,12 +46,18 @@ class ReserveController extends Controller
             return response()->json(['message' => 'schedule not found'], 400);
         }
 
-//        $screening_date = $schedule->start_time->format('Y-m-d');
+        //予約済みの座席情報を取得
+        $reserved = Reservation::where('schedule_id', $schedule_id)->where('date', $date)->get();
 
-        $screening_date = $request->date;
+        $reserved_sheets = array();
+        //予約済みの座席IDを配列に格納
+        for ($i = 0; $i < count($reserved); $i++) {
+            $reserved_sheets[$i] = $reserved[$i]->sheet_id;
+        }
 
-        return view('getReserveSheetsInfo')->with(['sheet_list' => $sheets, 'columns' => $columns, 'rows' => $rows, 'alphabet' => $alphabet, 'movie_id' => $movie_id, 'schedule_id' => $schedule_id, 'date' => $date]);
+        // $screening_date = $request->date;
 
+        return view('getReserveSheetsInfo')->with(['sheet_list' => $sheets, 'columns' => $columns, 'rows' => $rows, 'alphabet' => $alphabet, 'movie_id' => $movie_id, 'schedule_id' => $schedule_id, 'date' => $date, 'reserved_sheets' => $reserved_sheets]);
     }
 
     public function reserveform($movie_id, $schedule_id, Request $request)
@@ -67,6 +73,7 @@ class ReserveController extends Controller
             return response()->json(['message' => 'date is required'], 400);
         }
 
+
         $schedule = Schedule::find($schedule_id);
 
         if ($schedule == null) {
@@ -80,8 +87,18 @@ class ReserveController extends Controller
             //return error 400
             return response()->json(['message' => 'movie not found'], 400);
         }
-        return view('reserveForm')->with(['schedule' => $schedule, 'movie' => $movie, 'sheet_id' => $request->sheetId, 'date' => $request->date]);
 
+        $reservation_count = Reservation::where([['schedule_id', $request->schedule_id,], ['sheet_id', $request->sheetId]])->count();
+
+        if ($reservation_count != 0) {
+
+            //sheet.reserveformにリダイレクト
+            // $movie_id = $reservations[0]->schedule->movie_id;
+            // return redirect()->route('sheet.select', ['movie_id' => $movie_id, 'schedule_id' => $request->schedule_id])->with('message', 'その座席は既に予約済みです');
+            return response()->json(['message' => 'その座席は既に予約済みです'], 400);
+        }
+
+        return view('reserveForm')->with(['schedule' => $schedule, 'movie' => $movie, 'sheet_id' => $request->sheetId, 'date' => $request->date]);
     }
 
     //
@@ -110,7 +127,6 @@ class ReserveController extends Controller
             //sheet.reserveformにリダイレクト
             $movie_id = $reservations[0]->schedule->movie_id;
             return redirect()->route('sheet.reserveform', ['movie_id' => $movie_id, 'schedule_id' => $request->schedule_id,])->with('message', 'その座席は既に予約済みです');
-
         } else {
 
             //スケジュールIDは作品IDに紐づいている
@@ -129,7 +145,7 @@ class ReserveController extends Controller
             $reservation->sheet_id = $sheet_id;
             $reservation->name = $name;
             $reservation->email = $email;
-//            $reservation->screening_date = $screening_date;
+            //            $reservation->screening_date = $screening_date;
             $reservation->date = $screening_date;
             $result = $reservation->save();
 
@@ -140,13 +156,10 @@ class ReserveController extends Controller
             if ($result == null) {
                 //失敗時
                 return redirect()->route('sheet.reserveform', ['movie_id' => $movie_id, 'schedule_id' => $schedule_id])->with('message', '予約に失敗しました。');
-
             } else {
                 //成功時
                 return redirect()->route('sheet.reserveform', ['movie_id' => $movie_id, 'schedule_id' => $schedule_id])->with('message', '予約が完了しました。');
             }
         }
-
     }
-
 }
